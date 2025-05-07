@@ -1,0 +1,142 @@
+-- Tabla Evento
+CREATE TABLE Evento (
+    id_evento INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    fecha DATE,
+    lugar VARCHAR(100),
+    duracion VARCHAR(50),
+    patrocinadores TEXT
+);
+
+-- Tabla Proyecto
+CREATE TABLE Proyecto (
+    id_proyecto INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    tipo_negocio VARCHAR(100),
+    eslogan VARCHAR(255),
+    fecha_inscripcion DATE,
+    estado_aprobacion VARCHAR(50)
+);
+
+-- Tabla Estudiante
+CREATE TABLE Estudiante (
+    id_estudiante INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    correo VARCHAR(100),
+    rol VARCHAR(50), -- Líder o integrante
+    id_proyecto INT,
+    FOREIGN KEY (id_proyecto) REFERENCES Proyecto(id_proyecto)
+);
+
+-- Tabla Jurado
+CREATE TABLE Jurado (
+    id_jurado INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    especialidad VARCHAR(100),
+    contacto VARCHAR(100)
+);
+
+-- Tabla EvaluacionJurado
+CREATE TABLE EvaluacionJurado (
+    id_evaluacion INT PRIMARY KEY,
+    id_proyecto INT,
+    id_jurado INT,
+    puntaje DECIMAL(3,2),
+    comentarios TEXT,
+    FOREIGN KEY (id_proyecto) REFERENCES Proyecto(id_proyecto),
+    FOREIGN KEY (id_jurado) REFERENCES Jurado(id_jurado)
+);
+
+-- Tabla Clasificacion
+CREATE TABLE Clasificacion (
+    id_clasificacion INT PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+-- Tabla ProyectoClasificacion (relación muchos a muchos)
+CREATE TABLE ProyectoClasificacion (
+    id_proyecto INT,
+    id_clasificacion INT,
+    PRIMARY KEY (id_proyecto, id_clasificacion),
+    FOREIGN KEY (id_proyecto) REFERENCES Proyecto(id_proyecto),
+    FOREIGN KEY (id_clasificacion) REFERENCES Clasificacion(id_clasificacion)
+);
+
+-- Tabla Producto
+CREATE TABLE Producto (
+    id_producto INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    precio DECIMAL(10,2),
+    disponibilidad BOOLEAN,
+    id_proyecto INT,
+    FOREIGN KEY (id_proyecto) REFERENCES Proyecto(id_proyecto)
+);
+
+-- Tabla Transaccion
+CREATE TABLE Transaccion (
+    id_transaccion INT PRIMARY KEY,
+    id_producto INT,
+    cantidad INT,
+    valor DECIMAL(10,2),
+    fecha DATE,
+    FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
+);
+
+-- Tabla Visitante
+CREATE TABLE Visitante (
+    id_visitante INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    correo VARCHAR(100),
+    tipo VARCHAR(50) -- Estudiante o Externo
+);
+
+-- Tabla Visita
+CREATE TABLE Visita (
+    id_visita INT PRIMARY KEY,
+    id_visitante INT,
+    id_stand INT,
+    hora TIME,
+    FOREIGN KEY (id_visitante) REFERENCES Visitante(id_visitante),
+    FOREIGN KEY (id_stand) REFERENCES Stand(id_stand)
+);
+
+-- Tabla Encuesta
+CREATE TABLE Encuesta (
+    id_encuesta INT PRIMARY KEY,
+    id_visitante INT,
+    satisfaccion INT CHECK (satisfaccion BETWEEN 1 AND 5),
+    comentario TEXT,
+    FOREIGN KEY (id_visitante) REFERENCES Visitante(id_visitante)
+);
+
+-- Tabla Stand
+CREATE TABLE Stand (
+    id_stand INT PRIMARY KEY,
+    ubicacion VARCHAR(100),
+    id_proyecto INT,
+    id_evento INT,
+    FOREIGN KEY (id_proyecto) REFERENCES Proyecto(id_proyecto),
+    FOREIGN KEY (id_evento) REFERENCES Evento(id_evento)
+);
+
+-- Tabla AgendaStand
+CREATE TABLE AgendaStand (
+    id_agenda INT PRIMARY KEY,
+    id_stand INT,
+    tipo_actividad VARCHAR(100),
+    hora_inicio TIME,
+    hora_fin TIME,
+    descripcion TEXT,
+    FOREIGN KEY (id_stand) REFERENCES Stand(id_stand)
+);
+
+-- Tabla EvaluacionComite
+CREATE TABLE EvaluacionComite (
+    id_evalcomite INT PRIMARY KEY,
+    id_stand INT,
+    id_evento INT,
+    puntaje DECIMAL(3,2),
+    observaciones TEXT,
+    FOREIGN KEY (id_stand) REFERENCES Stand(id_stand),
+    FOREIGN KEY (id_evento) REFERENCES Evento(id_evento)
+);
