@@ -1,0 +1,87 @@
+-- 1. Promedio de puntajes otorgados por jurado a cada proyecto
+SELECT 
+    p.nombre AS proyecto,
+    AVG(ej.puntaje) AS promedio_puntaje
+FROM Proyecto p
+JOIN EvaluacionJurado ej ON p.id_proyecto = ej.id_proyecto
+GROUP BY p.id_proyecto;
+
+-- 2. Productos disponibles y sus precios por proyecto
+SELECT 
+    pr.nombre AS proyecto,
+    prod.nombre AS producto,
+    prod.precio
+FROM Proyecto pr
+JOIN Producto prod ON pr.id_proyecto = prod.id_proyecto
+WHERE prod.disponibilidad = TRUE;
+
+-- 3. Visitantes que asistieron a más de 3 stands
+SELECT 
+    v.nombre, 
+    COUNT(vi.id_stand) AS total_visitas
+FROM Visitante v
+JOIN Visita vi ON v.id_visitante = vi.id_visitante
+GROUP BY v.id_visitante
+HAVING COUNT(vi.id_stand) > 3;
+
+-- 4. Total de transacciones por producto
+SELECT 
+    p.nombre AS producto,
+    SUM(t.cantidad) AS total_vendido,
+    SUM(t.valor) AS ingreso_total
+FROM Producto p
+JOIN Transaccion t ON p.id_producto = t.id_producto
+GROUP BY p.id_producto;
+
+-- 5. Proyectos clasificados por temática
+SELECT 
+    c.nombre AS clasificacion,
+    COUNT(pc.id_proyecto) AS cantidad_proyectos
+FROM Clasificacion c
+JOIN ProyectoClasificacion pc ON c.id_clasificacion = pc.id_clasificacion
+GROUP BY c.id_clasificacion;
+
+-- 6. Proyectos con más de 2 productos
+SELECT 
+    p.nombre AS proyecto,
+    COUNT(prod.id_producto) AS cantidad_productos
+FROM Proyecto p
+JOIN Producto prod ON p.id_proyecto = prod.id_proyecto
+GROUP BY p.id_proyecto
+HAVING COUNT(prod.id_producto) > 2;
+
+-- 7. Stands más visitados en la franja horaria de 10:00 a 12:00
+SELECT 
+    s.ubicacion,
+    COUNT(v.id_visita) AS visitas
+FROM Stand s
+JOIN Visita v ON s.id_stand = v.id_stand
+WHERE v.hora BETWEEN '10:00:00' AND '12:00:00'
+GROUP BY s.id_stand
+ORDER BY visitas DESC;
+
+-- 8. Evaluaciones del comité por stand
+SELECT 
+    s.ubicacion,
+    ec.puntaje,
+    ec.observaciones
+FROM EvaluacionComite ec
+JOIN Stand s ON ec.id_stand = s.id_stand;
+
+-- 9. Visitantes y su nivel de satisfacción promedio
+SELECT 
+    v.nombre,
+    AVG(e.satisfaccion) AS promedio_satisfaccion
+FROM Visitante v
+JOIN Encuesta e ON v.id_visitante = e.id_visitante
+GROUP BY v.id_visitante;
+
+-- 10. Actividades programadas por stand (Agenda)
+SELECT 
+    s.ubicacion,
+    a.tipo_actividad,
+    a.hora_inicio,
+    a.hora_fin
+FROM Stand s
+JOIN AgendaStand a ON s.id_stand = a.id_stand
+ORDER BY s.id_stand, a.hora_inicio;
